@@ -1,0 +1,9 @@
+.trad-ioy-is-today td {
+    font-weight: bold;
+		text-shadow: .1em .1em .3em #cccccc;
+
+}
+
+select.trad-ioy-bible-version {
+	margin-left: .5em;
+}

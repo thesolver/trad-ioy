@@ -1,0 +1,8 @@
+table.form-table tr {
+	vertical-align: top;
+}
+
+#trad_ioy_meta_body_content textarea, #trad_ioy_meta_body_content input[type="text"],
+#trad_ioy_meta_body_content p.description {
+	width: 80%;
+}
