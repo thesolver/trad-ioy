@@ -36,4 +36,3 @@ $trad_ioy_post_def_settings = array(
 
 // better than trying to keep them manually in order...
 asort( $trad_ioy_def_settings['trad_ioy_avail_bible_versions'] );
-?>
