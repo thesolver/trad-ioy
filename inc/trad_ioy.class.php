@@ -110,8 +110,8 @@ class trad_ioy {
 		if ( $this->get_setting( 'trad_ioy_local_css' ) ) {
 			add_action( 'wp_head', array( $this, 'trad_ioy_add_custom_css' ) );
 		}
-      // we definitely need jQuery
-			wp_enqueue_script( 'jquery' );
+		// we definitely need jQuery
+		wp_enqueue_script( 'jquery' );
 
 		if ( $this->get_setting( 'trad_load_cookie_js' ) ) {
 			wp_enqueue_script( 'trad-cookie-js', plugins_url(

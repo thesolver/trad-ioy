@@ -21,7 +21,7 @@ $trad_ioy_def_settings = array(
 		'cookie'            => true
 	),
 	'trad_ioy_local_css'            => '',
-	'trad_ioy_version'              => '0.2',
+	'trad_ioy_version'              => '0.3',
 	'trad_ioy_avail_bible_versions' => array( 'esv'     => 'English Standard (ESV)',
 																						'niv'     => 'New International (NIV)', 'kjv' => 'King James (KJV)',
 																						'nasb95'  => 'New American Standard (NASB)', 'lbla95' => 'La Biblia de las Americas',

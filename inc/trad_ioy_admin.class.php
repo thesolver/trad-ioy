@@ -11,7 +11,7 @@
 class trad_ioy_admin extends trad_ioy {
 	function __construct( $def_settings ) {
 		parent::__construct( $def_settings );
-		add_action( 'admin_menu', array( $this, 'tradmedia_admin_settings_menu' ) );
+		add_action( 'admin_menu', array( $this, 'trad_ioy_admin_settings_menu' ) );
 		add_action( 'admin_init', array( $this, 'trad_ioy_admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'trad_ioy_load_admin_scripts' ) );
 		add_action( 'add_meta_boxes', array( $this, 'trad_ioy_register_meta_boxes' ) );
@@ -20,10 +20,17 @@ class trad_ioy_admin extends trad_ioy {
 
 	protected $options_page = false;
 
-	public function tradmedia_admin_settings_menu() {
+	public function trad_ioy_admin_settings_menu() {
+		// this first part makes sure we show the right version...
+		global $trad_ioy_def_settings;
+		if ( ( $option = get_option( 'trad_ioy_version' ) ) === false ) {
+			add_option( 'trad_ioy_version', $trad_ioy_def_settings['trad_ioy_version'], '', false );
+		} else {
+			update_option( 'trad_ioy_version', $trad_ioy_def_settings['trad_ioy_version'] );
+		}
 		$this->options_page = add_options_page( 'Traditores In-One-Year (Version ' . get_option( 'trad_ioy_version' ) . ') Settings',
 			'Traditores IOY', 'manage_options', 'trad-ioy',
-			array( $this, 'tradmedia_admin_settings_menu_body' ) );
+			array( $this, 'trad_ioy_admin_settings_menu_body' ) );
 
 		if ( $this->options_page ) {
 			add_action( 'load-' . $this->options_page, array( $this, 'trad_ioy_help_tabs' ) );
@@ -199,10 +206,10 @@ class trad_ioy_admin extends trad_ioy {
 	<?php
 	}
 
-	public function tradmedia_admin_settings_menu_body() {
+	public function trad_ioy_admin_settings_menu_body() {
 		?>
 		<div id="icon-options-general" class="icon32"><br /></div>
-		<h2>Pine Knoll Publications Media (Version <?php echo $this->get_setting( 'trad_ioy_version' ) ?>) Settings</h2>
+		<h2>Traditores In-One-Year (Version <?php echo $this->get_setting( 'trad_ioy_version' ) ?>) Settings</h2>
 		<?php if ( isset( $_GET['trad-ioy-message'] ) && '1' == $_GET['trad-ioy-message'] ) { ?>
 			<div id='trad-ioy-message' class='updated fade'><p><strong>Settings Saved</strong></p></div>
 		<?php } ?>
@@ -239,17 +246,12 @@ class trad_ioy_admin extends trad_ioy {
 
 
 	public function trad_ioy_admin_init() {
-		global $trad_ioy_def_settings;
-		if ( ( $option = get_option( 'trad_ioy_version' ) ) === false ) {
-			add_option( 'trad_ioy_version', $trad_ioy_def_settings['trad_ioy_version'], '', false );
-		} else {
-			update_option( 'trad_ioy_version', $trad_ioy_def_settings['trad_ioy_version'] );
-		}
 		add_action( 'admin_post_trad_save_settings', array( $this, 'admin_post_save_options' ) );
 		wp_enqueue_style( 'trad-ioy-admin', plugins_url( 'css/wp-admin.css', dirname( __FILE__ ) ) );
 	}
 
 	public function admin_post_save_options() {
+
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( 'Not allowed!' );
 		}
@@ -297,8 +299,6 @@ class trad_ioy_admin extends trad_ioy {
 			} else {
 				// This protects us from mistakenly deleting a setting because of a bad post...
 				$opt_value = $this->get_setting( $key );
-				// nothin' to see here, move along...
-				continue; // foreach $this->setting_loc
 			}
 
 			if ( false === $sec ) {

@@ -23,10 +23,9 @@ function trad_ioy_delete_options ($trad_ioy_def_settings,$trad_ioy_post_def_sett
 			if (get_option($key) !== false) {
 				delete_option($key);
 			}
-			foreach (array_keys($trad_ioy_post_def_settings) as $key) {
-				delete_post_meta_by_key($key);
-			}
+		}
+		foreach (array_keys($trad_ioy_post_def_settings) as $key) {
+			delete_post_meta_by_key($key);
 		}
 	}
 }
-?>

@@ -31,5 +31,3 @@ if ( is_admin() ) {
 
 // Wordpress discussions say this register_activation_hook must occur in the main plugin file...
 register_activation_hook( __FILE__, array( $trad_ioy, 'save_default_options' ) );
-
-?>
