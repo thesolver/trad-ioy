@@ -88,8 +88,6 @@ class trad_ioy {
 	}
 
 	public function trad_load_css_and_jss() {
-		// used to make sure our copy of jquery is loaded when we want
-		$jquery_handle = 'jquery';
 		// if none of the pages we are dealing with have shortcodes activated...don't do it...
 		if ( ! $this->trad_ioy_shortcodes_activated ) {
 			return;
@@ -112,32 +110,19 @@ class trad_ioy {
 		if ( $this->get_setting( 'trad_ioy_local_css' ) ) {
 			add_action( 'wp_head', array( $this, 'trad_ioy_add_custom_css' ) );
 		}
-
-		// load our local copy of the jQuery library if asked
-		if ( $this->get_setting( 'trad_load_jquery_js' ) ) {
-			// don't load the Wordpress jQuery
-			wp_deregister_script('jquery');
-			// keep track that we are using our jQuery (would have just reused 'jquery' as a handle, but it wouldn't work)
-			$jquery_handle = 'trad-jquery';
-			// would have put it in the footer, but it didn't work so well for the jQuery add-ons
-			wp_enqueue_script( 'trad-jquery', plugins_url(
-				$this->min_or_full( 'js/jquery/jquery-1.10.2', 'js', $trad_use_min_js ), dirname( __FILE__ ) ) );
-			add_action( 'wp_head', array( $this, 'trad_jquery_no_conflict' ) );
-		} else {
-			// we need jQuery regardless of where we get it...
+      // we definitely need jQuery
 			wp_enqueue_script( 'jquery' );
-		}
 
 		if ( $this->get_setting( 'trad_load_cookie_js' ) ) {
 			wp_enqueue_script( 'trad-cookie-js', plugins_url(
-					$this->min_or_full( 'js/jquery/jquery.cookie', 'js', false ), dirname( __FILE__ ) ), array( $jquery_handle ),
+					$this->min_or_full( 'js/jquery/jquery.cookie', 'js', false ), dirname( __FILE__ ) ), array( 'jquery' ),
 				false, true );
 		}
 
 		if ( $this->get_setting( 'trad_load_scrollto_js' ) ) {
 			wp_enqueue_script( 'trad-scrollto-js', plugins_url(
 					$this->min_or_full( 'js/jquery/jquery.scrollTo-1.4.3.1', 'js', $trad_use_min_js ), dirname( __FILE__ ) ),
-				array( $jquery_handle ), false, true );
+				array( 'jquery' ), false, true );
 		}
 
 		// add our special javascipt
@@ -217,17 +202,6 @@ class trad_ioy {
 
 	public function min_or_full( $filebasename, $ext, $min = false, $responsive = false ) {
 		return ( $filebasename . ( $responsive ? "-responsive" : "" ) . ( $min ? ".min." : "." ) . $ext );
-	}
-
-	// if we load our own jQuery library then we at least want to make sure we don't overtake the $ variable...
-	public function trad_jquery_no_conflict() {
-		?>
-		<script type="text/javascript">
-			//<! [CDATA[
-			jQuery.noConflict();
-			//]]>
-		</script>
-	<?php
 	}
 
 	public function trad_ioy_bible_select() {

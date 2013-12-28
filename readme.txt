@@ -3,7 +3,7 @@ Contributors: thesolver.us
 Requires at least: 3.0
 Tags: content, free, simple
 Tested up to: 3.8
-Stable tag: 0.2
+Stable tag: 0.3
 
 Insert a Bible reading plan into your posts or pages.
 
@@ -14,6 +14,10 @@ If you've never read the entire Bible, you should. If you have, you should again
 Traditores In-One-Year allows you to insert a table of Bible readings into your posts or pages. Each day has a link to that day's text at the free Bible service from Biblia.com.
 
 Features include being able to automatically scroll to today's reading, putting today's reading at the top of the table, and choosing from ten translations.
+
+== Installation ==
+
+The preferred installation method is through Wordpress itself, using "Plugins|Add New|Search Plugins" and then searching for "Traditores In-One-Year". However, you can manually use "Plugins|Add New|Upload" with the trad-ioy.zip file.
 
 == Frequently Asked Questions ==
 
@@ -27,6 +31,10 @@ Traditores In-One-Year is brand new, so there are no questions, let alone freque
 4. Traditores In-One-Year in action (with the Bible version drop-down expanded).
 
 == Changelog ==
+
+= Version 0.3 =
+
+Deprecated (removed) the ability to use a local copy of the jQuery library per the request of Wordpress.org's plugin review.
 
 = Version 0.2 =
 

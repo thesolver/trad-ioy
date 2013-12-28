@@ -4,7 +4,7 @@ Plugin Name: Traditores In-One-Year
 Plugin URI:
 Description: A Bible reading plan plugin for Wordpress
 Author: Alan Fahrner
-Version: 0.2
+Version: 0.3
 Author URI: http://traditores.org
 License: GPLv2 or later
 */

@@ -132,7 +132,6 @@ class trad_ioy_admin extends trad_ioy {
 						<legend class="screen-reader-text"><span>CSS and JavasScript</span></legend>
 						<label for="trad_use_min_js"><input type="checkbox" id="trad_use_min_js" name="trad_use_min_js" <?php checked( $this->get_setting( 'trad_use_min_js' ) ) ?> /> Use minimized css and js files where possible?</label><br />
 						<label for="trad_load_trad_ioy_css"><input type="checkbox" id="trad_load_trad_ioy_css" name="trad_load_trad_ioy_css" <?php checked( $this->get_setting( 'trad_load_trad_ioy_css' ) ) ?> /> Load Traditores In-One-Year css?</label><br />
-						<label for="trad_load_jquery_js"><input type="checkbox" id="trad_load_jquery_js" name="trad_load_jquery_js" <?php checked( $this->get_setting( 'trad_load_jquery_js' ) ) ?> /> Load Traditores In-One-Year&#39;s copy of jQuery?</label><br />
 						<label for="trad_load_cookie_js"><input type="checkbox" id="trad_load_cookie_js" name="trad_load_cookie_js" <?php checked( $this->get_setting( 'trad_load_cookie_js' ) ) ?> /> Load jQuery cookie extension?</label><br />
 						<label for="trad_load_scrollto_js"><input type="checkbox" id="trad_load_scrollto_js" name="trad_load_scrollto_js" <?php checked( $this->get_setting( 'trad_load_scrollto_js' ) ) ?> /> Load jQuery scrollTo extension?</label>
 					</fieldset>

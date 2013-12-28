@@ -10,7 +10,6 @@
 $trad_ioy_def_settings = array(
 	'trad_ioy_gen_settings'         => array(
 		'use_min_js'        => true,
-		'load_jquery_js'    => false,
 		'load_cookie_js'    => true,
 		'load_scrollto_js'  => true,
 		'load_trad_ioy_css' => true,
