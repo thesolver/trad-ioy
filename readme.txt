@@ -1,73 +1,69 @@
 === Traditores In-One-Year ===
-Contributors: thesolver.us
-Requires at least: 3.0
-Tags: content, free, simple
-Tested up to: 3.8
-Stable tag: 0.3
+Contributors: thesolverus
+Tags: bible, reading plan, scripture, devotional, shortcode
+Requires at least: 6.5
+Tested up to: 7.1
+Requires PHP: 8.0
+Stable tag: 1.0.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Insert a Bible reading plan into your posts or pages.
 
 == Description ==
 
-If you've never read the entire Bible, you should. If you have, you should again. :-)
+Traditores In-One-Year displays a table of daily Bible readings. Each day links to that day's text on [Biblia.com](https://biblia.com/) (Faithlife). The plugin does not call Biblia from your server; the visitor's browser loads Biblia only after they click a link.
 
-Traditores In-One-Year allows you to insert a table of Bible readings into your posts or pages. Each day has a link to that day's text at the free Bible service from Biblia.com.
+Features include scroll-to-today, optional duplication of today's row at the top of the table, a visitor-selectable Bible translation (stored in an optional browser cookie), the `[tradioy]` shortcode, and a "Bible Reading Plan" block.
 
-Features include being able to automatically scroll to today's reading, putting today's reading at the top of the table, and choosing from ten translations.
+Reading plans are in English.
+
+== Privacy ==
+
+When the cookie option is enabled, the plugin may store the selected Bible version code in a first-party cookie (`trad_ioy_bible_version`) for up to one year. No data is sent to Traditores servers. Links use Biblia.com; see [Faithlife Terms](https://faithlife.com/terms) and [Faithlife Privacy](https://www.logos.com/privacy).
 
 == Installation ==
 
-The preferred installation method is through Wordpress itself, using "Plugins|Add New|Search Plugins" and then searching for "Traditores In-One-Year". However, you can manually use "Plugins|Add New|Upload" with the trad-ioy.zip file.
+1. Install through **Plugins → Add New** and search for "Traditores In-One-Year", or upload the plugin zip.
+2. Activate the plugin.
+3. Open **Settings → Traditores IOY** to choose defaults.
+4. Add the block or shortcode `[tradioy]` to a post or page.
 
 == Frequently Asked Questions ==
 
-Traditores In-One-Year is brand new, so there are no questions, let alone frequently asked ones. :-)
+= Does this plugin require a Biblia account? =
+
+No. Links open the public Biblia reader.
+
+= How do I show only the New Testament plan? =
+
+Use `[tradioy type="nt"]` or choose "New Testament" in the block.
 
 == Screenshots ==
 
-1. Main configuration panel.
-2. Page/post level configuration (to turn Traditores In-One-Year on for a page/post).
-3. Traditores In-One-Year in action at http://traditores.org/in-one-year/.
-4. Traditores In-One-Year in action (with the Bible version drop-down expanded).
+1. Settings screen
+2. Reading plan on the front end
 
 == Changelog ==
 
-= Version 0.3 =
+= 1.0.0 =
+* Security and PHP 8.2+ compatibility overhaul
+* Settings API, dynamic block, shortcode-driven asset loading
+* HTTPS Biblia links, HCSB/NRSV code fixes with upgrade migration
+* Modern front-end JavaScript (scrollIntoView, native cookies)
+* Plugin Check and coding standards compliance
 
-Deprecated (removed) the ability to use a local copy of the jQuery library per the request of Wordpress.org's plugin review.
+= 0.3 =
+* Deprecated local jQuery copy per WordPress.org review.
 
-= Version 0.2 =
+= 0.2 =
+* Initial release.
 
-Original distributed version.
+== Upgrade Notice ==
 
-== More Info ==
+= 1.0.0 =
+Major update: test reading plans and settings after upgrading. Bible codes hscb→hcsb and nsrv→nrsv migrate automatically.
 
-Please be sure to consider this plugin in its "beta" stage.
+== Development ==
 
-Traditores In-One-Year is the first Wordpress plugin produced by Traditores (http://traditores.org) and written by Alan Fahrner (http://www.TheSolver.us/resume/). It will always be free, but if you want to show appreciation, please give a listen to Traditores Radio (http://tradio.in) and, if you like it, let us know (and tell your friends about Traditores Radio).
-
-Actually, even if you don't like it, please let us know. In either case:
-
-http://traditores.org/contact-us/
-
-And, that address is also a good way to let us know if you run into any issues, have any suggestions, or would like us to provide some other Bible reading plans.
-
-If you've never read the entire Bible, you should. If you have, you should again. :-)
-
-= Links =
-
-http://traditores.org - Traditores' web home
-http://tradio.in - Traditores Radio's web home
-http://facebook.com/traditores - Traditores' Facebook home
-http://twitter.com/traditores - Traditores' Twitter home
-http://www.TheSolver.com - Alan Fahrner's consulting business
-
-= Traditores Radio =
-
-Traditores Radio: the good news about Jesus Christ around the clock and around the globe.
-
-Available at http://tradio.in (in-page players), at http://TuneIn.com (and within the TuneIn app for every smartphone), at http://SHOUTcast.com (and in SHOUTcast-powered applications), in Windows Media Guide (http://www.windowsmedia.com/radioui/home.aspx) and Windows Media Player (under "Religious"), and in iTunes (under "Internet" then "Religious").
-
-
-
-
+Source: https://github.com/thesolverus/trad-ioy

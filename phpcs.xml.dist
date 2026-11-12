@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<ruleset name="Traditores In-One-Year">
+	<description>WordPress Coding Standards for trad-ioy</description>
+	<file>.</file>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/tmpl/*</exclude-pattern>
+	<exclude-pattern>*/blocks/reading-plan/index.js</exclude-pattern>
+	<exclude-pattern>*/js/trad-ioy.js</exclude-pattern>
+
+	<rule ref="WordPress-Extra"/>
+	<rule ref="WordPress.WP.I18n">
+		<properties>
+			<property name="text_domain" type="array">
+				<element value="traditores-in-one-year"/>
+			</property>
+		</properties>
+	</rule>
+
+	<config name="testVersion" value="8.0-"/>
+</ruleset>

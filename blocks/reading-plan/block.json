@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "traditores-in-one-year/reading-plan",
+	"version": "1.0.0",
+	"title": "Bible Reading Plan",
+	"category": "widgets",
+	"icon": "book",
+	"description": "Insert a Traditores In-One-Year Bible reading plan.",
+	"textdomain": "traditores-in-one-year",
+	"attributes": {
+		"planType": {
+			"type": "string",
+			"default": "all66"
+		},
+		"scrollToToday": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"editorScript": "file:./index.js"
+}
