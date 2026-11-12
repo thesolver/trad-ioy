@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [ master, 'cursor/**' ]
+  pull_request:
+
+jobs:
+  phpcs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer
+      - run: composer install --no-progress
+      - run: vendor/bin/phpcs
+
+  plugin-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli
+      - name: Install WordPress
+        run: |
+          curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+          wp core download --path=/tmp/wp
+          sudo service mysql start || true
+          sudo mysql -e "CREATE DATABASE IF NOT EXISTS wp_test; CREATE USER IF NOT EXISTS 'wp'@'localhost' IDENTIFIED BY 'wp'; GRANT ALL ON wp_test.* TO 'wp'@'localhost'; FLUSH PRIVILEGES;"
+          cd /tmp/wp && wp config create --dbname=wp_test --dbuser=wp --dbpass=wp --dbhost=127.0.0.1 --skip-check
+          wp core install --url=http://example.com --title=Test --admin_user=admin --admin_password=admin --admin_email=admin@example.com --skip-email
+      - name: Install Plugin Check
+        run: |
+          cd /tmp/wp && wp plugin install plugin-check --activate
+      - name: Build distribution tree and check
+        run: |
+          DIST=/tmp/traditores-in-one-year
+          rm -rf "$DIST"
+          mkdir -p "$DIST"
+          rsync -a --delete \
+            --exclude '.git' --exclude '.github' --exclude 'vendor' --exclude 'tests' \
+            --exclude '.gitignore' --exclude '.distignore' --exclude 'phpunit.xml.dist' \
+            --exclude 'phpcs.xml.dist' --exclude 'composer.json' --exclude 'composer.lock' \
+            --exclude '.wordpress-org' --exclude 'bin' --exclude '.phpunit.result.cache' \
+            "$GITHUB_WORKSPACE/" "$DIST/"
+          ln -s "$DIST" /tmp/wp/wp-content/plugins/traditores-in-one-year
+          cd /tmp/wp && wp plugin activate traditores-in-one-year
+          wp plugin check traditores-in-one-year
