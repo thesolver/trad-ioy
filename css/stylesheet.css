@@ -1,9 +1,23 @@
 .trad-ioy-is-today td {
-    font-weight: bold;
+	font-weight: bold;
 		text-shadow: .1em .1em .3em #cccccc;
 
 }
 
 select.trad-ioy-bible-version {
 	margin-left: .5em;
+}
+
+/* Themes that do not ship this utility would otherwise show the table caption. */
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
 }
