@@ -18,7 +18,9 @@ jobs:
       - run: vendor/bin/phpcs
 
   plugin-check:
-    runs-on: ubuntu-latest
+    # This image's MySQL root account is root/root. ubuntu-latest is not pinned
+    # because that password is part of the 24.04 runner image, not a later one.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -31,8 +33,8 @@ jobs:
           chmod +x wp-cli.phar
           sudo mv wp-cli.phar /usr/local/bin/wp
           wp core download --path=/tmp/wp
-          sudo service mysql start || true
-          sudo mysql -e "CREATE DATABASE IF NOT EXISTS wp_test; CREATE USER IF NOT EXISTS 'wp'@'localhost' IDENTIFIED BY 'wp'; GRANT ALL ON wp_test.* TO 'wp'@'localhost'; FLUSH PRIVILEGES;"
+          sudo systemctl start mysql
+          sudo mysql --user=root --password=root --protocol=tcp -e "CREATE DATABASE IF NOT EXISTS wp_test; CREATE USER IF NOT EXISTS 'wp'@'127.0.0.1' IDENTIFIED BY 'wp'; GRANT ALL PRIVILEGES ON wp_test.* TO 'wp'@'127.0.0.1'; FLUSH PRIVILEGES;"
           cd /tmp/wp && wp config create --dbname=wp_test --dbuser=wp --dbpass=wp --dbhost=127.0.0.1 --skip-check
           wp core install --url=http://example.com --title=Test --admin_user=admin --admin_password=admin --admin_email=admin@example.com --skip-email
       - name: Install Plugin Check

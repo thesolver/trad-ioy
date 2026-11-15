@@ -2,8 +2,18 @@
 	var el = element.createElement;
 	var useBlockProps = blockEditor.useBlockProps;
 	var SelectControl = components.SelectControl;
-	var ToggleControl = components.ToggleControl;
 	var __ = i18n.__;
+
+	function scrollChoice(value) {
+		if (value === true || value === '1' || value === 'true' || value === 'yes' || value === 'y') {
+			return '1';
+		}
+		if (value === '0' || value === 'no' || value === 'n') {
+			return '0';
+		}
+		// Boolean false was the old implicit default, which means "use the site setting".
+		return '';
+	}
 
 	blocks.registerBlockType( 'traditores-in-one-year/reading-plan', {
 		edit: function ( props ) {
@@ -25,9 +35,14 @@
 						setAttributes( { planType: value } );
 					},
 				} ),
-				el( ToggleControl, {
+				el( SelectControl, {
 					label: __( 'Scroll to today on load', 'traditores-in-one-year' ),
-					checked: attributes.scrollToToday,
+					value: scrollChoice( attributes.scrollToToday ),
+					options: [
+						{ label: __( 'Use site setting', 'traditores-in-one-year' ), value: '' },
+						{ label: __( 'On', 'traditores-in-one-year' ), value: '1' },
+						{ label: __( 'Off', 'traditores-in-one-year' ), value: '0' },
+					],
 					onChange: function ( value ) {
 						setAttributes( { scrollToToday: value } );
 					},

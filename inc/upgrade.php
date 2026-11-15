@@ -26,12 +26,9 @@ function trad_ioy_maybe_upgrade() {
 		$gen = array();
 	}
 
-	$bible_map = array(
-		'hscb' => 'hcsb',
-		'nsrv' => 'nrsv',
-	);
-	if ( isset( $gen['bible_version'] ) && isset( $bible_map[ $gen['bible_version'] ] ) ) {
-		$gen['bible_version'] = $bible_map[ $gen['bible_version'] ];
+	$bible_map = trad_ioy_legacy_bible_version_map();
+	if ( isset( $gen['bible_version'] ) ) {
+		$gen['bible_version'] = trad_ioy_normalize_bible_version_code( $gen['bible_version'] );
 	}
 
 	$versions = get_option( 'trad_ioy_avail_bible_versions', array() );

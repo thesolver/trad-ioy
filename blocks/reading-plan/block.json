@@ -14,8 +14,8 @@
 			"default": "all66"
 		},
 		"scrollToToday": {
-			"type": "boolean",
-			"default": false
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {

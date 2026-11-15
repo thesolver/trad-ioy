@@ -51,6 +51,7 @@ Use `[tradioy type="nt"]` or choose "New Testament" in the block.
 * Settings API, dynamic block, shortcode-driven asset loading
 * HTTPS Biblia links, HCSB/NRSV code fixes with upgrade migration
 * Modern front-end JavaScript (scrollIntoView, native cookies)
+* Bible version switching follows the saved default, including legacy visitor cookies
 * Plugin Check and coding standards compliance
 
 = 0.3 =
@@ -66,4 +67,4 @@ Major update: test reading plans and settings after upgrading. Bible codes hscbâ
 
 == Development ==
 
-Source: https://github.com/thesolverus/trad-ioy
+Source: https://github.com/thesolver/trad-ioy

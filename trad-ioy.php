@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name:       Traditores In-One-Year
- * Plugin URI:        https://github.com/thesolverus/trad-ioy
+ * Plugin URI:        https://github.com/thesolver/trad-ioy
  * Description:       Insert a Bible reading plan into posts or pages with optional scroll-to-today and Bible version selection.
  * Version:           1.0.0
  * Requires at least: 6.5
@@ -32,6 +32,9 @@ if ( is_admin() ) {
 
 /**
  * Bootstrap plugin.
+ *
+ * Runs on init so other plugins can register trad_ioy_bible_versions on
+ * plugins_loaded before defaults are installed and before the public list is read.
  */
 function trad_ioy_bootstrap() {
 	$def_settings = trad_ioy_get_default_settings();
@@ -44,7 +47,7 @@ function trad_ioy_bootstrap() {
 		new Trad_Ioy( $def_settings );
 	}
 }
-add_action( 'plugins_loaded', 'trad_ioy_bootstrap', 5 );
+add_action( 'init', 'trad_ioy_bootstrap', 1 );
 
 register_activation_hook( __FILE__, 'trad_ioy_on_activate' );
 

@@ -8,12 +8,39 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Filterable list of Biblia.com Bible version codes => labels.
+ * Legacy Biblia codes stored by v0.3, mapped to the codes Biblia uses.
  *
  * @return array<string, string>
  */
-function trad_ioy_default_bible_versions() {
-	$versions = array(
+function trad_ioy_legacy_bible_version_map() {
+	return array(
+		'hscb' => 'hcsb',
+		'nsrv' => 'nrsv',
+	);
+}
+
+/**
+ * Lowercases a version code and applies the v0.3 spelling map.
+ *
+ * @param mixed $code Raw version code.
+ * @return string
+ */
+function trad_ioy_normalize_bible_version_code( $code ) {
+	$code = strtolower( (string) $code );
+	$map  = trad_ioy_legacy_bible_version_map();
+	if ( isset( $map[ $code ] ) ) {
+		return $map[ $code ];
+	}
+	return $code;
+}
+
+/**
+ * Built-in Biblia version codes, before the trad_ioy_bible_versions filter.
+ *
+ * @return array<string, string>
+ */
+function trad_ioy_builtin_bible_versions() {
+	return array(
 		'esv'     => 'English Standard (ESV)',
 		'niv'     => 'New International (NIV)',
 		'kjv'     => 'King James (KJV)',
@@ -25,15 +52,97 @@ function trad_ioy_default_bible_versions() {
 		'nlt'     => 'New Living Translation (NLT)',
 		'message' => 'The Message',
 	);
+}
+
+/**
+ * Keeps string code => label pairs and maps legacy codes.
+ *
+ * @param mixed $versions Raw list.
+ * @return array<string, string>
+ */
+function trad_ioy_sanitize_bible_version_list( $versions ) {
+	if ( ! is_array( $versions ) ) {
+		return array();
+	}
+
+	$clean = array();
+	foreach ( $versions as $code => $label ) {
+		if ( is_int( $code ) ) {
+			$code = (string) $code;
+		}
+		if ( ! is_string( $code ) ) {
+			continue;
+		}
+		$code = trad_ioy_normalize_bible_version_code( $code );
+		if ( ! preg_match( '/^[a-z0-9_-]+$/', $code ) ) {
+			continue;
+		}
+		if ( is_array( $label ) || is_object( $label ) ) {
+			continue;
+		}
+		$clean[ $code ] = (string) $label;
+	}
+
+	return $clean;
+}
+
+/**
+ * Filterable list of Biblia.com Bible version codes => labels.
+ *
+ * A non-array filter return is ignored so a bad callback cannot take down the request.
+ *
+ * @return array<string, string>
+ */
+function trad_ioy_default_bible_versions() {
+	$versions = trad_ioy_builtin_bible_versions();
 
 	/**
 	 * Filters the Bible versions available in the reading plan UI.
 	 *
+	 * Return the full list to show. Add, rename, or remove codes here.
+	 * The front end reads this on each request, not a copy saved at upgrade time.
+	 *
 	 * @param array<string, string> $versions Version code => label.
 	 */
-	$versions = apply_filters( 'trad_ioy_bible_versions', $versions );
-	asort( $versions );
-	return $versions;
+	$filtered = apply_filters( 'trad_ioy_bible_versions', $versions );
+	if ( ! is_array( $filtered ) ) {
+		$filtered = $versions;
+	}
+
+	$clean = trad_ioy_sanitize_bible_version_list( $filtered );
+	if ( array() === $clean ) {
+		$clean = trad_ioy_sanitize_bible_version_list( $versions );
+	}
+
+	asort( $clean );
+	return $clean;
+}
+
+/**
+ * Bible versions for the public select and the script allow-list.
+ *
+ * The filtered list is the list visitors see, so removals and renames apply.
+ * Codes stored in the option that are not part of the built-in set are kept,
+ * which preserves a database-only translation without letting the saved copy
+ * of the built-in list undo the filter.
+ *
+ * @param mixed $stored Stored trad_ioy_avail_bible_versions value.
+ * @return array<string, string>
+ */
+function trad_ioy_merge_bible_versions( $stored ) {
+	$builtin  = trad_ioy_builtin_bible_versions();
+	$filtered = trad_ioy_default_bible_versions();
+	$extra    = trad_ioy_sanitize_bible_version_list( $stored );
+
+	foreach ( $extra as $code => $label ) {
+		if ( isset( $filtered[ $code ] ) || isset( $builtin[ $code ] ) ) {
+			continue;
+		}
+		$filtered[ $code ] = $label;
+	}
+
+	asort( $filtered );
+	return $filtered;
 }
 
 /**

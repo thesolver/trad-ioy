@@ -113,22 +113,50 @@ class Trad_Ioy {
 	}
 
 	/**
-	 * Enqueue when post content may contain shortcode (early hook).
+	 * Enqueue when main-query content may contain the plan.
+	 *
+	 * Passing null leaves scroll on the saved setting. false would force it off.
 	 */
 	public function register_privacy_shortcode_assets() {
 		if ( is_admin() ) {
 			return;
 		}
-		if ( ! is_singular() ) {
-			return;
+
+		foreach ( $this->get_main_query_posts() as $post ) {
+			$has_plan = has_shortcode( $post->post_content, 'tradioy' )
+				|| has_block( 'traditores-in-one-year/reading-plan', $post );
+			if ( $has_plan ) {
+				$this->enqueue_frontend_assets( null );
+				return;
+			}
 		}
-		$post = get_post();
-		if ( ! $post instanceof WP_Post ) {
-			return;
+	}
+
+	/**
+	 * Posts in the main query, plus the queried singular object.
+	 *
+	 * Archives and the blog index are included so styles print in the header,
+	 * matching the v0.3 main-query check. Widgets still enqueue at render time.
+	 *
+	 * @return WP_Post[]
+	 */
+	protected function get_main_query_posts() {
+		$found = array();
+		$query = $GLOBALS['wp_query'] ?? null;
+		if ( is_object( $query ) && isset( $query->posts ) && is_array( $query->posts ) ) {
+			foreach ( $query->posts as $post ) {
+				if ( $post instanceof WP_Post ) {
+					$found[ $post->ID ] = $post;
+				}
+			}
 		}
-		if ( has_shortcode( $post->post_content, 'tradioy' ) || has_block( 'traditores-in-one-year/reading-plan', $post ) ) {
-			$this->enqueue_frontend_assets( false );
+
+		$queried = get_queried_object();
+		if ( $queried instanceof WP_Post ) {
+			$found[ $queried->ID ] = $queried;
 		}
+
+		return array_values( $found );
 	}
 
 	/**
@@ -154,12 +182,18 @@ class Trad_Ioy {
 	 * @return string
 	 */
 	public function render_block( $attributes ) {
-		$type   = isset( $attributes['planType'] ) ? (string) $attributes['planType'] : 'all66';
-		$scroll = isset( $attributes['scrollToToday'] ) ? (bool) $attributes['scrollToToday'] : null;
+		$type = isset( $attributes['planType'] ) ? (string) $attributes['planType'] : 'all66';
+		$atts = array(
+			'type' => $type,
+		);
 
-		$atts = array( 'type' => $type );
-		if ( null !== $scroll ) {
-			$atts['scroll'] = $scroll ? '1' : '0';
+		// Missing or empty scrollToToday inherits the site setting. Boolean false
+		// was the old implicit default and means the same thing.
+		$scroll_choice = $attributes['scrollToToday'] ?? null;
+		if ( true === $scroll_choice ) {
+			$atts['scroll'] = '1';
+		} elseif ( is_string( $scroll_choice ) && '' !== $scroll_choice ) {
+			$atts['scroll'] = $scroll_choice;
 		}
 
 		return $this->render_reading_plan( $atts );
@@ -206,7 +240,7 @@ class Trad_Ioy {
 		}
 
 		$this->scroll_override = null;
-		$scroll_attr           = $atts['scroll'];
+		$scroll_attr           = $atts['scroll'] ?? '';
 		if ( '' !== $scroll_attr ) {
 			$scroll_on             = in_array( strtolower( (string) $scroll_attr ), array( 'y', '1', 'true', 'yes' ), true );
 			$this->scroll_override = $scroll_on;
@@ -242,22 +276,40 @@ class Trad_Ioy {
 
 		$inline_css = $this->get_setting( 'trad_ioy_local_css' );
 		if ( $this->get_setting( 'trad_load_trad_ioy_css' ) || $inline_css ) {
-			wp_enqueue_style( 'trad-ioy' );
+			$this->enqueue_public_style( 'trad-ioy' );
 		}
 
 		$css_file = $this->get_setting( 'trad_ioy_local_css_file' );
 		if ( $css_file ) {
-			wp_enqueue_style( 'trad-ioy-custom', $css_file, array(), TRAD_IOY_VERSION );
+			$this->enqueue_public_style( 'trad-ioy-custom', $css_file );
 		}
 
 		if ( $inline_css ) {
-			wp_enqueue_style( 'trad-ioy' );
+			$this->enqueue_public_style( 'trad-ioy' );
 			wp_add_inline_style( 'trad-ioy', wp_strip_all_tags( $inline_css ) );
 		}
 
 		wp_enqueue_script( 'trad-ioy' );
 		$this->attach_script_config( $scroll_override );
 		$this->assets_enqueued = true;
+	}
+
+	/**
+	 * Enqueues a style. After wp_print_styles, put it in the footer group so it still prints.
+	 *
+	 * @param string $handle Style handle.
+	 * @param string $src    Source URL when the style is not already registered.
+	 */
+	protected function enqueue_public_style( $handle, $src = '' ) {
+		if ( '' !== $src ) {
+			wp_enqueue_style( $handle, $src, array(), TRAD_IOY_VERSION );
+		} else {
+			wp_enqueue_style( $handle );
+		}
+
+		if ( did_action( 'wp_print_styles' ) ) {
+			wp_style_add_data( $handle, 'group', 1 );
+		}
 	}
 
 	/**
@@ -277,6 +329,7 @@ class Trad_Ioy {
 			'cookie'          => (bool) $this->get_setting( 'trad_cookie' ),
 			'copyTodayRow'    => (bool) $this->get_setting( 'trad_copy_row' ),
 			'bibleVersion'    => $version,
+			'templateVersion' => $version,
 			'allowedVersions' => array_values( array_map( 'sanitize_key', $allowed ) ),
 		);
 
@@ -293,12 +346,16 @@ class Trad_Ioy {
 	 * @return string
 	 */
 	protected function get_bible_version_code() {
-		$code    = sanitize_key( (string) $this->get_setting( 'trad_ioy_bible_version' ) );
+		$code    = trad_ioy_normalize_bible_version_code( sanitize_key( (string) $this->get_setting( 'trad_ioy_bible_version' ) ) );
 		$allowed = $this->get_setting( 'trad_ioy_avail_bible_versions' );
-		if ( ! isset( $allowed[ $code ] ) ) {
-			$code = 'esv';
+		if ( isset( $allowed[ $code ] ) ) {
+			return $code;
 		}
-		return $code;
+		if ( isset( $allowed['esv'] ) ) {
+			return 'esv';
+		}
+		$first = array_key_first( $allowed );
+		return is_string( $first ) ? $first : 'esv';
 	}
 
 	/**
@@ -306,6 +363,11 @@ class Trad_Ioy {
 	 * @return mixed
 	 */
 	protected function get_setting( $key ) {
+		if ( 'trad_ioy_avail_bible_versions' === $key ) {
+			$stored = get_option( 'trad_ioy_avail_bible_versions', array() );
+			return trad_ioy_merge_bible_versions( is_array( $stored ) ? $stored : array() );
+		}
+
 		if ( ! isset( $this->setting_loc[ $key ], $this->setting_type[ $key ] ) ) {
 			return '';
 		}

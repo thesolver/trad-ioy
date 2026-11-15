@@ -6,6 +6,8 @@
 	<exclude-pattern>*/node_modules/*</exclude-pattern>
 	<exclude-pattern>*/tmpl/*</exclude-pattern>
 	<exclude-pattern>*/blocks/reading-plan/index.js</exclude-pattern>
+	<!-- WordPress requires this filename; the FileName sniff wants index-asset.php. -->
+	<exclude-pattern>*/blocks/reading-plan/index.asset.php</exclude-pattern>
 	<exclude-pattern>*/js/trad-ioy.js</exclude-pattern>
 
 	<rule ref="WordPress-Extra"/>

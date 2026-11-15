@@ -68,15 +68,9 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 			)
 		);
 
-		register_setting(
-			'trad_ioy_settings',
-			'trad_ioy_avail_bible_versions',
-			array(
-				'type'              => 'array',
-				'sanitize_callback' => array( $this, 'sanitize_bible_versions' ),
-				'default'           => trad_ioy_default_bible_versions(),
-			)
-		);
+		// trad_ioy_avail_bible_versions is written by trad_ioy_maybe_upgrade() only.
+		// Registering it here would reset the stored list on every save, because
+		// the form has no fields for it and options.php would pass null.
 
 		add_settings_section(
 			'trad_ioy_primary',
@@ -164,14 +158,22 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 			return $this->def_settings['trad_ioy_gen_settings'];
 		}
 
-		$allowed_versions = trad_ioy_default_bible_versions();
+		$allowed_versions = $this->get_setting( 'trad_ioy_avail_bible_versions' );
 		$output           = wp_parse_args( $input, $this->def_settings['trad_ioy_gen_settings'] );
 
+		// options.php already unslashed this input.
 		$output['bible_version'] = isset( $input['bible_version'] )
-			? sanitize_key( wp_unslash( $input['bible_version'] ) )
+			? trad_ioy_normalize_bible_version_code( sanitize_key( $input['bible_version'] ) )
 			: 'esv';
 		if ( ! isset( $allowed_versions[ $output['bible_version'] ] ) ) {
-			$output['bible_version'] = 'esv';
+			$fallback = 'esv';
+			if ( ! isset( $allowed_versions['esv'] ) ) {
+				$first = array_key_first( $allowed_versions );
+				if ( is_string( $first ) ) {
+					$fallback = $first;
+				}
+			}
+			$output['bible_version'] = $fallback;
 		}
 
 		$flags = array( 'scroll', 'copy_row', 'cookie', 'load_trad_ioy_css', 'delete_settings' );
@@ -180,7 +182,7 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 		}
 
 		if ( isset( $input['local_css_file'] ) ) {
-			$output['local_css_file'] = esc_url_raw( wp_unslash( trim( $input['local_css_file'] ) ), array( 'http', 'https' ) );
+			$output['local_css_file'] = esc_url_raw( trim( (string) $input['local_css_file'] ), array( 'http', 'https' ) );
 		}
 
 		$this->settings['trad_ioy_gen_settings'] = $output;
@@ -192,30 +194,12 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 	 * @return string
 	 */
 	public function sanitize_local_css( $input ) {
-		$input = is_string( $input ) ? wp_unslash( $input ) : '';
+		// options.php already unslashed this input. A second unslash eats backslashes.
+		$input = is_string( $input ) ? $input : '';
 		if ( false !== stripos( $input, '</style>' ) ) {
 			return '';
 		}
 		return wp_strip_all_tags( $input );
-	}
-
-	/**
-	 * @param array<string, string> $input Versions list.
-	 * @return array<string, string>
-	 */
-	public function sanitize_bible_versions( $input ) {
-		if ( ! is_array( $input ) ) {
-			return trad_ioy_default_bible_versions();
-		}
-		$clean = array();
-		foreach ( $input as $key => $label ) {
-			$key = sanitize_key( $key );
-			if ( '' === $key ) {
-				continue;
-			}
-			$clean[ $key ] = sanitize_text_field( wp_unslash( $label ) );
-		}
-		return $clean ? $clean : trad_ioy_default_bible_versions();
 	}
 
 	/**
@@ -276,7 +260,7 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 			);
 			?>
 			</h1>
-			<?php settings_errors( 'trad_ioy_settings' ); ?>
+			<?php settings_errors(); ?>
 			<form action="options.php" method="post">
 				<?php
 				settings_fields( 'trad_ioy_settings' );
@@ -293,7 +277,7 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 	 */
 	public function section_uninstall_description() {
 		echo '<p>' . esc_html__(
-			'When enabled, plugin options are removed if you delete the plugin from the Plugins screen. WordPress may still warn about data removal; the checkbox controls whether options are actually deleted. Multisite: configure each site separately.',
+			'When enabled, plugin options are removed if you delete the plugin from the Plugins screen. WordPress may still warn about data removal; the checkbox controls whether options are actually deleted. On a multisite network, set this per site. Uninstall cleans up only the sites that opted in.',
 			'traditores-in-one-year'
 		) . '</p>';
 	}
@@ -311,8 +295,8 @@ class Trad_Ioy_Admin extends Trad_Ioy {
 
 	public function field_bible_version() {
 		$gen      = $this->get_gen_settings();
-		$current  = isset( $gen['bible_version'] ) ? sanitize_key( $gen['bible_version'] ) : 'esv';
-		$versions = trad_ioy_default_bible_versions();
+		$current  = isset( $gen['bible_version'] ) ? trad_ioy_normalize_bible_version_code( sanitize_key( $gen['bible_version'] ) ) : 'esv';
+		$versions = $this->get_setting( 'trad_ioy_avail_bible_versions' );
 		?>
 		<select id="trad_ioy_bible_version" name="trad_ioy_gen_settings[bible_version]">
 			<?php foreach ( $versions as $key => $label ) : ?>

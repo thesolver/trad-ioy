@@ -29,6 +29,17 @@
 		return allowed.indexOf(code) !== -1;
 	}
 
+	// v0.3 cookies used the misspelled codes. Keep the visitor's choice.
+	function mapLegacyVersion(code) {
+		if (code === 'hscb') {
+			return 'hcsb';
+		}
+		if (code === 'nsrv') {
+			return 'nrsv';
+		}
+		return code;
+	}
+
 	function todayClass() {
 		var now = new Date();
 		var month = now.getMonth() + 1;
@@ -58,14 +69,19 @@
 	}
 
 	function initTable(table, config) {
-		var defaultVersion = config.bibleVersion;
-		var activeVersion = defaultVersion;
-		var templateVersion = 'esv';
+		// PHP already wrote this code into every Biblia URL ({version} substitution).
+		var templateVersion = config.templateVersion || config.bibleVersion || 'esv';
+		var defaultVersion = config.bibleVersion || templateVersion;
+		var activeVersion = templateVersion;
 
 		if (config.cookie) {
 			var stored = getCookie('trad_ioy_bible_version');
-			if (stored && isAllowedVersion(stored, config.allowedVersions)) {
-				activeVersion = stored;
+			var mapped = stored ? mapLegacyVersion(stored) : stored;
+			if (mapped && isAllowedVersion(mapped, config.allowedVersions)) {
+				activeVersion = mapped;
+				if (mapped !== stored) {
+					setCookie('trad_ioy_bible_version', mapped, 365);
+				}
 			} else {
 				setCookie('trad_ioy_bible_version', defaultVersion, 365);
 			}
