@@ -41,8 +41,10 @@ Use `[tradioy type="nt"]` or choose "New Testament" in the block.
 
 == Screenshots ==
 
-1. Settings screen
-2. Reading plan on the front end
+1. Settings screen (Settings → Traditores IOY).
+2. Reading plan on the front end, with today's reading copied to the top and highlighted.
+3. Visitors can choose a Bible translation; every reading link switches to it.
+4. The Bible Reading Plan block in the editor.
 
 == Changelog ==
 
